@@ -4,28 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="84273746-cd2d-4ecf-abe0-33dfbccae312" name="Changes" comment="&quot;Первый коммит&quot;">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HELP.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mvnw" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mvnw.cmd" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/by/morozmaksim/deepseekjavaproject/DeepseekJavaProjectApplication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/by/morozmaksim/deepseekjavaproject/domain/Task.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/by/morozmaksim/deepseekjavaproject/repository/TaskRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/by/morozmaksim/deepseekjavaproject/repository/TaskRepositoryImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/by/morozmaksim/deepseekjavaproject/service/TaskService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/by/morozmaksim/deepseekjavaproject/service/TaskServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/by/morozmaksim/deepseekjavaproject/web/controller/TaskController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/by/morozmaksim/deepseekjavaproject/DeepseekJavaProjectApplicationTests.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/by/morozmaksim/deepseekjavaproject/DeepseekJavaProjectApplication.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/by/morozmaksim/deepseekjavaproject/domain/Task.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/by/morozmaksim/deepseekjavaproject/repository/TaskRepository.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+    <list default="true" id="84273746-cd2d-4ecf-abe0-33dfbccae312" name="Changes" comment="Добавлены crud операции для Task">
+      <change afterPath="$PROJECT_DIR$/.github/workflows/code-review.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -37,16 +17,10 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Class" />
-        <option value="Interface" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="main" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory"><![CDATA[{
@@ -78,14 +52,12 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.Project.executor": "Debug",
+    "Application.Project.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feat/task-01-setup-crud",
-    "kotlin-language-version-configured": "true",
-    "settings.editor.selected.configurable": "editor.preferences.inline.completion"
+    "git-widget-placeholder": "#1 on feat/task-01-setup-crud",
+    "kotlin-language-version-configured": "true"
   }
 }]]></component>
   <component name="RunManager">
@@ -112,15 +84,6 @@
       <option name="presentableId" value="Default" />
       <updated>1776100148224</updated>
     </task>
-    <task id="LOCAL-00001" summary="&quot;Первый коммит&quot;">
-      <option name="closed" value="true" />
-      <created>1776101020337</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1776101020337</updated>
-    </task>
-    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -133,10 +96,6 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="&quot;Первый коммит&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;Первый коммит&quot;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
