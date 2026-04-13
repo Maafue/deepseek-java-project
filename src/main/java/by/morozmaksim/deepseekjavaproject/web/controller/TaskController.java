@@ -1,0 +1,37 @@
+package by.morozmaksim.deepseekjavaproject.web.controller;
+
+import by.morozmaksim.deepseekjavaproject.domain.Task;
+import by.morozmaksim.deepseekjavaproject.service.TaskService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/tasks")
+@RequiredArgsConstructor
+public class TaskController {
+
+    private final TaskService taskService;
+
+    @PostMapping
+    public Task createTask(@RequestBody Task task) {
+        return taskService.createTask(task);
+    }
+
+    @GetMapping
+    public List<Task> getAllTasks(){
+        return taskService.getTasks();
+    }
+
+    @GetMapping("/{id}")
+    public Task getTask(@PathVariable Long id){
+        return taskService.getTask(id);
+    }
+
+    @DeleteMapping("/{id}")
+    void deleteTask(@PathVariable Long id){
+        taskService.delete(id);
+    }
+
+}
