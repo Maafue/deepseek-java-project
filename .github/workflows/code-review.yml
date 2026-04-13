@@ -1,60 +1,78 @@
-- name: Prepare review prompt
-  id: prep
-  run: |
-    # Проверяем существование файла
-    if [ ! -f pr.diff ]; then
-      echo "pr.diff not found" >&2
-      exit 1
-    fi
+name: Code Review with DeepSeek
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
 
-    # Ограничиваем размер diff (первые 5000 строк) и экранируем для JSON
-    DIFF=$(head -5000 pr.diff | jq -Rs .)
-    echo "prompt=${DIFF}" >> $GITHUB_OUTPUT
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-- name: Call DeepSeek API
-  env:
-    DEEPSEEK_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-  run: |
-    # Получаем промпт из предыдущего шага
-    PROMPT="${{ steps.prep.outputs.prompt }}"
+      - name: Generate diff
+        run: |
+          git diff --no-color --unified=0 ${{ github.event.pull_request.base.sha }} ${{ github.sha }} > pr.diff
 
-    # Формируем JSON-запрос с корректным экранированием
-    REQUEST_JSON=$(jq -n \
-      --arg model "deepseek-chat" \
-      --arg system_msg "Ты опытный Java-разработчик" \
-      --arg user_msg "$PROMPT" \
-      '{
-        "model": $model,
-        "messages": [
-          {"role": "system", "content": $system_msg},
-          {"role": "user", "content": $user_msg}
-        ]
-      }')
+      - name: Prepare review prompt
+        id: prep
+        run: |
+          # Проверяем существование файла
+          if [ ! -f pr.diff ]; then
+            echo "pr.diff not found" >&2
+            exit 1
+          fi
 
-    # Отправляем запрос к API
-    RESPONSE=$(curl -s -X POST https://api.deepseek.com/v1/chat/completions \
-      -H "Content-Type: application/json" \
-      -H "Authorization: Bearer $DEEPSEEK_KEY" \
-      -d "$REQUEST_JSON")
+          # Ограничиваем размер diff (первые 5000 строк) и экранируем для JSON
+          DIFF=$(head -5000 pr.diff | jq -Rs .)
+          echo "prompt=${DIFF}" >> $GITHUB_OUTPUT
 
-    echo "$RESPONSE" > response.json
+      - name: Call DeepSeek API
+        env:
+          DEEPSEEK_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          # Получаем промпт из предыдущего шага
+          PROMPT="${{ steps.prep.outputs.prompt }}"
 
-    # Извлекаем ответ, обрабатываем возможные ошибки
-    COMMENT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // ("Ошибка: " + (.error.message // "unknown"))')
+          # Формируем JSON-запрос с корректным экранированием
+          REQUEST_JSON=$(jq -n \
+            --arg model "deepseek-chat" \
+            --arg system_msg "Ты опытный Java-разработчик" \
+            --arg user_msg "$PROMPT" \
+            '{
+              "model": $model,
+              "messages": [
+                {"role": "system", "content": $system_msg},
+                {"role": "user", "content": $user_msg}
+              ]
+            }')
 
-    # Сохраняем комментарий без дополнительного экранирования
-    echo "REVIEW_COMMENT=${COMMENT}" >> $GITHUB_ENV
+          # Отправляем запрос к API
+          RESPONSE=$(curl -s -X POST https://api.deepseek.com/v1/chat/completions \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $DEEPSEEK_KEY" \
+            -d "$REQUEST_JSON")
 
-- name: Post comment to PR
-  env:
-    GITHUB_TOKEN: ${{ github.token }}
-  run: |
-    # Экранируем комментарий для использования в JSON
-    ESCAPED_COMMENT=$(echo "${{ env.REVIEW_COMMENT }}" | jq -Rs .)
+          echo "$RESPONSE" > response.json
 
-    # Отправляем комментарий в PR
-    curl -X POST \
-      -H "Authorization: Bearer $GITHUB_TOKEN" \
-      -H "Accept: application/vnd.github.v3+json" \
-      "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
-      -d "{\"body\": \"## 🤖 Code Review от DeepSeek\n\n${ESCAPED_COMMENT}\"}"
+          # Извлекаем ответ, обрабатываем возможные ошибки
+          COMMENT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // ("Ошибка: " + (.error.message // "unknown"))')
+
+          # Сохраняем комментарий без дополнительного экранирования
+          echo "REVIEW_COMMENT=${COMMENT}" >> $GITHUB_ENV
+
+      - name: Post comment to PR
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          # Экранируем комментарий для использования в JSON
+          ESCAPED_COMMENT=$(echo "${{ env.REVIEW_COMMENT }}" | jq -Rs .)
+
+          # Отправляем комментарий в PR
+          curl -X POST \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            -d "{\"body\": \"## 🤖 Code Review от DeepSeek\n\n${ESCAPED_COMMENT}\"}"
