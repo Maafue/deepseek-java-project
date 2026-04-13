@@ -1,58 +1,41 @@
-name: DeepSeek Code Review
+- name: Prepare review prompt
+  id: prep
+  run: |
+    # Ограничиваем размер diff (первые 5000 строк)
+    DIFF=$(head -5000 pr.diff | jq -Rs .)
+    echo "prompt=${DIFF}" >> $GITHUB_OUTPUT
 
-on:
-  pull_request:
-    types: [opened, synchronize]
+- name: Call DeepSeek API
+  env:
+    DEEPSEEK_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+  run: |
+    # Экранируем промпт для JSON
+    PROMPT_ESCAPED=$(echo "${{ steps.prep.outputs.prompt }}" | jq -R .)
+    
+    RESPONSE=$(curl -s -X POST https://api.deepseek.com/v1/chat/completions \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer $DEEPSEEK_KEY" \
+      -d "{
+        \"model\": \"deepseek-chat\",
+        \"messages\": [
+          {\"role\": \"system\", \"content\": \"Ты опытный Java-разработчик\"},
+          {\"role\": \"user\", \"content\": $PROMPT_ESCAPED}
+        ]
+      }")
+    
+    echo "$RESPONSE" > response.json
+    COMMENT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // "Ошибка: \(.error.message // "unknown")"')
+    
+    # Экранируем для GitHub API
+    ESCAPED_COMMENT=$(echo "$COMMENT" | jq -R .)
+    echo "REVIEW_COMMENT=$ESCAPED_COMMENT" >> $GITHUB_ENV
 
-permissions:
-  pull-requests: write
-
-jobs:
-  review:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Get PR diff
-        run: |
-          curl -L \
-            -H "Accept: application/vnd.github.v3.diff" \
-            -H "Authorization: Bearer ${{ github.token }}" \
-            "${{ github.event.pull_request.diff_url }}" > pr.diff
-
-      - name: Prepare review prompt
-        id: prep
-        run: |
-          DIFF=$(cat pr.diff | jq -Rsa .)
-          echo "prompt=Отревьювь Java-код в этом PR. Напиши на русском, кратко, укажи конкретные файлы и строки. Дифф: ${DIFF}" >> $GITHUB_OUTPUT
-
-      - name: Call DeepSeek API
-        env:
-          DEEPSEEK_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: |
-          curl -X POST https://api.deepseek.com/v1/chat/completions \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $DEEPSEEK_KEY" \
-            -d '{
-              "model": "deepseek-chat",
-              "messages": [
-                {"role": "system", "content": "Ты опытный Java-разработчик, делаешь код-ревью"},
-                {"role": "user", "content": "'"${{ steps.prep.outputs.prompt }}"'"}
-              ]
-            }' > response.json
-          
-          COMMENT=$(jq -r '.choices[0].message.content' response.json)
-          echo "REVIEW_COMMENT=$COMMENT" >> $GITHUB_ENV
-
-      - name: Post comment to PR
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          curl -X POST \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
-            -d "{\"body\": \"## 🤖 Code Review от DeepSeek\n\n${{ env.REVIEW_COMMENT }}\"}"
+- name: Post comment to PR
+  env:
+    GITHUB_TOKEN: ${{ github.token }}
+  run: |
+    curl -X POST \
+      -H "Authorization: Bearer $GITHUB_TOKEN" \
+      -H "Accept: application/vnd.github.v3+json" \
+      "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+      -d "{\"body\": \"## 🤖 Code Review от DeepSeek\n\n${{ env.REVIEW_COMMENT }}\"}"
