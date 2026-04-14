@@ -40,4 +40,13 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{taskId}/status")
+    public Task updateStatus(@PathVariable Long taskId, @RequestParam String status){
+        return taskService.updateStatus(taskId, status);
+    }
+
+    @GetMapping("/status")
+    public List<Task> findAllByStatus(@RequestParam String status){
+        return taskService.findAllByStatus(status);
+    }
 }
