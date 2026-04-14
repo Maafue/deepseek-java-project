@@ -16,7 +16,6 @@ public class TaskServiceImpl implements TaskService{
     private final TaskRepository taskRepository;
 
     @Override
-    @CacheEvict(value = "tasks", key = "#task.id")
     public Task createTask(Task task) {
         if (task.getCompleted() == null ) task.setCompleted(false);
         return taskRepository.save(task);

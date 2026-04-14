@@ -8,8 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
@@ -20,6 +18,7 @@ public class CacheConfiguration {
     public CacheManager cacheManager(){
         CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
         caffeineCacheManager.setCaffeine(caffeineCacheBuilder());
+        caffeineCacheManager.setCacheNames(Arrays.asList("tasks"));
         return caffeineCacheManager;
     }
 
