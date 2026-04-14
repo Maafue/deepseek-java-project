@@ -4,8 +4,6 @@ import by.morozmaksim.deepseekjavaproject.domain.Task;
 import by.morozmaksim.deepseekjavaproject.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -32,7 +30,6 @@ public class TaskServiceImpl implements TaskService{
     @Override
     public Task createTask(Task task) {
         if (task.getCompleted() == null ) task.setCompleted(false);
-        task.setCreatedAt(LocalDateTime.now());
         return taskRepository.save(task);
     }
 }
