@@ -1,6 +1,6 @@
 package by.morozmaksim.deepseekjavaproject.web.controller;
 
-import by.morozmaksim.deepseekjavaproject.domain.Task;
+import by.morozmaksim.deepseekjavaproject.domain.entity.Task;
 import by.morozmaksim.deepseekjavaproject.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

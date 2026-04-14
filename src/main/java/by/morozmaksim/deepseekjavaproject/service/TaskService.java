@@ -1,6 +1,6 @@
 package by.morozmaksim.deepseekjavaproject.service;
 
-import by.morozmaksim.deepseekjavaproject.domain.Task;
+import by.morozmaksim.deepseekjavaproject.domain.entity.Task;
 
 import java.util.List;
 

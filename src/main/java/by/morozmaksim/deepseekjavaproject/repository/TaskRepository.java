@@ -1,6 +1,6 @@
 package by.morozmaksim.deepseekjavaproject.repository;
 
-import by.morozmaksim.deepseekjavaproject.domain.Task;
+import by.morozmaksim.deepseekjavaproject.domain.entity.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

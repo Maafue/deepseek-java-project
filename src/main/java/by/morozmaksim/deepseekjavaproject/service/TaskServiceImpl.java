@@ -1,6 +1,7 @@
 package by.morozmaksim.deepseekjavaproject.service;
 
-import by.morozmaksim.deepseekjavaproject.domain.Task;
+import by.morozmaksim.deepseekjavaproject.domain.entity.Task;
+import by.morozmaksim.deepseekjavaproject.domain.exception.ResourceNotFoundException;
 import by.morozmaksim.deepseekjavaproject.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,8 @@ public class TaskServiceImpl implements TaskService{
 
     @Override
     public void delete(Long id) {
-        taskRepository.deleteById(id);
+        Task task = getTask(id);
+        taskRepository.delete(task);
     }
 
     @Override
@@ -24,7 +26,8 @@ public class TaskServiceImpl implements TaskService{
 
     @Override
     public Task getTask(Long id) {
-        return taskRepository.getReferenceById(id);
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id=" + id + " not found"));
     }
 
     @Override
