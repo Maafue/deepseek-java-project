@@ -16,7 +16,7 @@ import java.util.List;
 public class RestExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionBody handleResourceNotFoundException(ResourceNotFoundException e){
         return new ExceptionBody(e.getMessage());
     }
