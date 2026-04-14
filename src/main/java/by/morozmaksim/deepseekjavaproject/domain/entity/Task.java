@@ -1,7 +1,7 @@
 package by.morozmaksim.deepseekjavaproject.domain.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -17,7 +17,7 @@ public class Task {
     @Column(nullable = false, updatable = false)
     private Long id;
 
-    @NotNull
+    @NotBlank
     private String title;
 
     private Boolean completed;
