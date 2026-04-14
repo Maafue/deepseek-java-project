@@ -2,6 +2,7 @@ package by.morozmaksim.deepseekjavaproject.web.controller;
 
 import by.morozmaksim.deepseekjavaproject.domain.entity.Task;
 import by.morozmaksim.deepseekjavaproject.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+    public ResponseEntity<Task> createTask(@Valid @RequestBody Task task) {
         Task created = taskService.createTask(task);
         URI location = URI.create("/tasks/" + created.getId());
         return ResponseEntity.created(location).body(created);
@@ -34,7 +35,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Task> deleteTask(@PathVariable Long id){
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id){
         taskService.delete(id);
         return ResponseEntity.noContent().build();
     }
