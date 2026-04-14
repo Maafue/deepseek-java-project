@@ -14,4 +14,9 @@ public class ExceptionBody {
         this.message = message;
     }
 
+    public ExceptionBody(String message, Map<String, String> errors) {
+        this.message = message;
+        this.errors = errors;
+    }
+
 }
