@@ -1,74 +1,75 @@
-name: Code Review with DeepSeek
+# Пока неактуально
+# name: Code Review with DeepSeek
 
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+# on:
+#   pull_request:
+#     types: [opened, synchronize, reopened]
 
-jobs:
-  review:
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
+# jobs:
+#   review:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       pull-requests: write
     
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
       
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
+#       - name: Install jq
+#         run: sudo apt-get update && sudo apt-get install -y jq
       
-      - name: Generate diff
-        run: |
-          git diff --no-color ${{ github.event.pull_request.base.sha }} ${{ github.sha }} > pr.diff
-          echo "Diff size: $(wc -l < pr.diff) lines"
-          head -100 pr.diff  # Покажем первые строки для отладки
+#       - name: Generate diff
+#         run: |
+#           git diff --no-color ${{ github.event.pull_request.base.sha }} ${{ github.sha }} > pr.diff
+#           echo "Diff size: $(wc -l < pr.diff) lines"
+#           head -100 pr.diff  # Покажем первые строки для отладки
       
-      - name: Call DeepSeek API
-        id: review
-        env:
-          DEEPSEEK_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: |
-          # Читаем diff (ограничиваем размер)
-          DIFF=$(head -1500 pr.diff)
+#       - name: Call DeepSeek API
+#         id: review
+#         env:
+#           DEEPSEEK_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+#         run: |
+#           # Читаем diff (ограничиваем размер)
+#           DIFF=$(head -1500 pr.diff)
           
-          # Экранируем для JSON
-          ESCAPED_DIFF=$(printf '%s' "$DIFF" | jq -Rs .)
+#           # Экранируем для JSON
+#           ESCAPED_DIFF=$(printf '%s' "$DIFF" | jq -Rs .)
           
-          # Формируем запрос
-          jq -n \
-            --arg model "deepseek-chat" \
-            --arg system "Ты опытный Java-разработчик. Отвечай на русском языке. Будь конкретным." \
-            --arg user_msg "Проведи код-ревью этих изменений:\n\n$DIFF\n\nДай список замечаний по приоритету." \
-            '{
-              model: $model,
-              messages: [
-                {role: "system", content: $system},
-                {role: "user", content: $user_msg}
-              ],
-              temperature: 0.3,
-              max_tokens: 2000
-            }' > request.json
+#           # Формируем запрос
+#           jq -n \
+#             --arg model "deepseek-chat" \
+#             --arg system "Ты опытный Java-разработчик. Отвечай на русском языке. Будь конкретным." \
+#             --arg user_msg "Проведи код-ревью этих изменений:\n\n$DIFF\n\nДай список замечаний по приоритету." \
+#             '{
+#               model: $model,
+#               messages: [
+#                 {role: "system", content: $system},
+#                 {role: "user", content: $user_msg}
+#               ],
+#               temperature: 0.3,
+#               max_tokens: 2000
+#             }' > request.json
           
-          # Отправляем запрос
-          curl -s -X POST https://api.deepseek.com/v1/chat/completions \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $DEEPSEEK_KEY" \
-            -d @request.json > response.json
+#           # Отправляем запрос
+#           curl -s -X POST https://api.deepseek.com/v1/chat/completions \
+#             -H "Content-Type: application/json" \
+#             -H "Authorization: Bearer $DEEPSEEK_KEY" \
+#             -d @request.json > response.json
           
-          # Извлекаем комментарий
-          COMMENT=$(jq -r '.choices[0].message.content // "Ревью не сгенерировано"' response.json)
-          echo "comment=$COMMENT" >> $GITHUB_OUTPUT
+#           # Извлекаем комментарий
+#           COMMENT=$(jq -r '.choices[0].message.content // "Ревью не сгенерировано"' response.json)
+#           echo "comment=$COMMENT" >> $GITHUB_OUTPUT
       
-      - name: Post comment
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          COMMENT='${{ steps.review.outputs.comment }}'
-          ESCAPED=$(echo "$COMMENT" | jq -Rs .)
-          curl -X POST \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
-            -d "{\"body\": $(echo "## 🤖 Code Review\n\n$COMMENT" | jq -Rs .)}"
+#       - name: Post comment
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         run: |
+#           COMMENT='${{ steps.review.outputs.comment }}'
+#           ESCAPED=$(echo "$COMMENT" | jq -Rs .)
+#           curl -X POST \
+#             -H "Authorization: Bearer $GITHUB_TOKEN" \
+#             -H "Accept: application/vnd.github.v3+json" \
+#             "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+#             -d "{\"body\": $(echo "## 🤖 Code Review\n\n$COMMENT" | jq -Rs .)}"
