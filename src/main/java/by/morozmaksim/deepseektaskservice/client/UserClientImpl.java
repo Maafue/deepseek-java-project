@@ -1,6 +1,5 @@
 package by.morozmaksim.deepseektaskservice.client;
 
-import by.morozmaksim.deepseektaskservice.client.dto.UserDto;
 import by.morozmaksim.deepseektaskservice.domain.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,13 +17,11 @@ public class UserClientImpl implements UserClient {
     private String url;
 
     @Override
-    public UserDto getUserByUserId(Long userId) {
-        UserDto userDto;
+    public void checkUserExist(Long userId) {
         try {
-            userDto = restTemplate.getForObject(url + "/" + userId, UserDto.class);
+            restTemplate.getForObject(url + "/" + userId, Void.class);
         } catch (RestClientException e) {
             throw new ResourceNotFoundException(e.getMessage());
         }
-        return userDto;
     }
 }

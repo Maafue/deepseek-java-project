@@ -1,15 +1,11 @@
 package by.morozmaksim.deepseektaskservice.service;
 
 import by.morozmaksim.deepseektaskservice.client.UserClient;
-import by.morozmaksim.deepseektaskservice.client.dto.UserDto;
-import by.morozmaksim.deepseektaskservice.client.dto.UserWithTasksDto;
 import by.morozmaksim.deepseektaskservice.domain.entity.Task;
 import by.morozmaksim.deepseektaskservice.domain.entity.TaskStatus;
 import by.morozmaksim.deepseektaskservice.domain.exception.InvalidStatusTransitionException;
 import by.morozmaksim.deepseektaskservice.domain.exception.ResourceNotFoundException;
 import by.morozmaksim.deepseektaskservice.repository.TaskRepository;
-import by.morozmaksim.deepseektaskservice.web.dto.TaskDto;
-import by.morozmaksim.deepseektaskservice.web.mapper.TaskMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,11 +19,10 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final UserClient userClient;
-    private final TaskMapper taskMapper;
 
     @Override
     public Task createTask(Task task) {
-        if (task.getUserId() != null) userClient.getUserByUserId(task.getUserId());
+        if (task.getUserId() != null) userClient.checkUserExist(task.getUserId());
         task.setStatus(TaskStatus.TODO);
         return taskRepository.save(task);
     }
@@ -92,35 +87,24 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskDto assignUserToTask(Long taskId, Long userId) {
-        UserDto userDto = userClient.getUserByUserId(userId);
+    public Task assignUserToTask(Long taskId, Long userId) {
+        userClient.checkUserExist(userId);
         Task task = getTask(taskId);
         task.setUserId(userId);
         taskRepository.save(task);
-        TaskDto taskDto = taskMapper.taskToTaskDto(task);
-        taskDto.setUser(userDto);
-        return taskDto;
+        return task;
     }
 
     @Override
-    public TaskDto unassignUserToTask(Long taskId) {
+    public Task unassignUserToTask(Long taskId) {
         Task task = getTask(taskId);
         task.setUserId(null);
         taskRepository.save(task);
-        TaskDto taskDto = taskMapper.taskToTaskDto(task);
-        return taskDto;
+        return task;
     }
 
     @Override
-    public UserWithTasksDto getByUserId(Long userId) {
-        List<Task> taskList = taskRepository.findByUserId(userId);
-        UserDto user = userClient.getUserByUserId(userId);
-
-        List<TaskDto> taskDtos = taskMapper.tasksToTaskDto(taskList);
-
-        UserWithTasksDto userWithTasksDto = new UserWithTasksDto();
-        userWithTasksDto.setTasks(taskDtos);
-        userWithTasksDto.setUser(user);
-        return userWithTasksDto;
+    public List<Task> getAllByUserId(Long userId) {
+        return taskRepository.findByUserId(userId);
     }
 }

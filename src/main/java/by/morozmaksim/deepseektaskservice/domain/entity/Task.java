@@ -19,8 +19,6 @@ public class Task {
     @Column(nullable = false, updatable = false)
     private Long id;
 
-    @NotBlank(message = "Title must not be blank.")
-    @Size(min = 3, max = 100, message = "Title must be min = 3, max = 100")
     private String title;
 
     @CreationTimestamp
@@ -31,7 +29,6 @@ public class Task {
     private TaskStatus status;
 
     @Column(name = "user_id")
-    @JsonProperty("user_id")
     private Long userId;
 
 }
