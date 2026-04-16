@@ -1,7 +1,9 @@
-package by.morozmaksim.deepseekjavaproject.web.controller;
+package by.morozmaksim.deepseektaskservice.web.controller;
 
-import by.morozmaksim.deepseekjavaproject.domain.entity.Task;
-import by.morozmaksim.deepseekjavaproject.service.TaskService;
+import by.morozmaksim.deepseektaskservice.client.dto.UserWithTasksDto;
+import by.morozmaksim.deepseektaskservice.domain.entity.Task;
+import by.morozmaksim.deepseektaskservice.service.TaskService;
+import by.morozmaksim.deepseektaskservice.web.dto.TaskDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -48,5 +50,19 @@ public class TaskController {
     @GetMapping("/status")
     public List<Task> findAllByStatus(@RequestParam String status){
         return taskService.findAllByStatus(status);
+    }
+
+    @PatchMapping("/{id}/assign")
+    public TaskDto assignUserToTask(@PathVariable Long id, @RequestParam Long userId){
+        return taskService.assignUserToTask(id, userId);
+    }
+    @PatchMapping("/{id}/unassign")
+    public TaskDto unassignUserFromTask(@PathVariable Long id, @RequestParam Long userId){
+        return taskService.unassignUserToTask(id, userId);
+    }
+
+    @GetMapping("/user/{userId}")
+    public UserWithTasksDto getByUserId(@PathVariable Long userId){
+        return taskService.getByUserId(userId);
     }
 }

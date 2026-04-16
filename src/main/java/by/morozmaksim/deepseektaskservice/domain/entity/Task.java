@@ -1,5 +1,6 @@
-package by.morozmaksim.deepseekjavaproject.domain.entity;
+package by.morozmaksim.deepseektaskservice.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -22,13 +23,15 @@ public class Task {
     @Size(min = 3, max = 100, message = "Title must be min = 3, max = 100")
     private String title;
 
-    private Boolean completed;
-
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
+
+    @Column(name = "user_id")
+    @JsonProperty("user_id")
+    private Long userId;
 
 }

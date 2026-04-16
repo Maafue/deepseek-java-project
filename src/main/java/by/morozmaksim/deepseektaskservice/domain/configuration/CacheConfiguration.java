@@ -1,4 +1,4 @@
-package by.morozmaksim.deepseekjavaproject.domain.configuration;
+package by.morozmaksim.deepseektaskservice.domain.configuration;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
