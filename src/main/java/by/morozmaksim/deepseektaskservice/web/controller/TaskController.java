@@ -57,8 +57,8 @@ public class TaskController {
         return taskService.assignUserToTask(id, userId);
     }
     @PatchMapping("/{id}/unassign")
-    public TaskDto unassignUserFromTask(@PathVariable Long id, @RequestParam Long userId){
-        return taskService.unassignUserToTask(id, userId);
+    public TaskDto unassignUserFromTask(@PathVariable Long id){
+        return taskService.unassignUserToTask(id);
     }
 
     @GetMapping("/user/{userId}")

@@ -15,6 +15,6 @@ public interface TaskService {
     void delete(Long id);
     List<Task> findAllByStatus(String status);
     TaskDto assignUserToTask(Long taskId, Long userId);
-    TaskDto unassignUserToTask(Long taskId, Long userId);
+    TaskDto unassignUserToTask(Long taskId);
     UserWithTasksDto getByUserId(Long userId);
 }

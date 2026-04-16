@@ -103,8 +103,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskDto unassignUserToTask(Long taskId, Long userId) {
-        UserDto userDto = userClient.getUserByUserId(userId);
+    public TaskDto unassignUserToTask(Long taskId) {
         Task task = getTask(taskId);
         task.setUserId(null);
         taskRepository.save(task);
