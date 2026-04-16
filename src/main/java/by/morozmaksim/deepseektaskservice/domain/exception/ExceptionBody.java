@@ -1,4 +1,4 @@
-package by.morozmaksim.deepseekjavaproject.domain.exception;
+package by.morozmaksim.deepseektaskservice.domain.exception;
 
 import lombok.Data;
 

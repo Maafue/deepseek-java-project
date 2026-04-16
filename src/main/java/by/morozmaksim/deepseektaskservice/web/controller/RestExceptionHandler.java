@@ -1,8 +1,8 @@
-package by.morozmaksim.deepseekjavaproject.web.controller;
+package by.morozmaksim.deepseektaskservice.web.controller;
 
-import by.morozmaksim.deepseekjavaproject.domain.exception.ExceptionBody;
-import by.morozmaksim.deepseekjavaproject.domain.exception.InvalidStatusTransitionException;
-import by.morozmaksim.deepseekjavaproject.domain.exception.ResourceNotFoundException;
+import by.morozmaksim.deepseektaskservice.domain.exception.ExceptionBody;
+import by.morozmaksim.deepseektaskservice.domain.exception.InvalidStatusTransitionException;
+import by.morozmaksim.deepseektaskservice.domain.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
