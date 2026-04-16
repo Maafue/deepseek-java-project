@@ -7,10 +7,14 @@ import by.morozmaksim.deepseektaskservice.web.dto.ResponseTaskDto;
 import by.morozmaksim.deepseektaskservice.web.mapper.TaskMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -28,6 +32,15 @@ public class TaskController {
         ResponseTaskDto responseRequestTaskDto = taskMapper.taskToResponseTask(createdTask);
         URI location = URI.create("/tasks/" + createdTask.getId());
         return ResponseEntity.created(location).body(responseRequestTaskDto);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseTaskDto updateTask(@PathVariable Long id, @Valid @RequestBody RequestTaskDto requestTaskDto){
+        Task task = taskMapper.requestTaskToTask(requestTaskDto);
+        Task createdTask = taskService.updateTask(id, task);
+        ResponseTaskDto responseRequestTaskDto = taskMapper.taskToResponseTask(createdTask);
+        URI location = URI.create("/tasks/" + createdTask.getId());
+        return responseRequestTaskDto;
     }
 
     @GetMapping

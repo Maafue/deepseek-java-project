@@ -8,7 +8,9 @@ import by.morozmaksim.deepseektaskservice.domain.exception.ResourceNotFoundExcep
 import by.morozmaksim.deepseektaskservice.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +23,7 @@ public class TaskServiceImpl implements TaskService {
     private final UserClient userClient;
 
     @Override
+    @CachePut(value = "tasks", key = "#result.id")
     public Task createTask(Task task) {
         if (task.getUserId() != null) userClient.checkUserExist(task.getUserId());
         task.setStatus(TaskStatus.TODO);
@@ -28,10 +31,19 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @CachePut(value = "tasks", key = "#result.id")
+    public Task updateTask(Long id, Task task) {
+        Task existTask = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id=" + id + " not found"));
+        if (task.getTitle() != null) existTask.setTitle(task.getTitle());
+        if (task.getStatus() != null) existTask.setStatus(task.getStatus());
+        return taskRepository.save(existTask);
+    }
+
+    @Override
     @Cacheable(value = "tasks", key = "#id")
     public Task getTask(Long id) {
-        return taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task with id=" + id + " not found"));
+        return findTaskById(id);
     }
 
     @Override
@@ -42,14 +54,17 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @CacheEvict(value = "tasks", key = "#id")
     public void delete(Long id) {
-        Task task = getTask(id);
-        taskRepository.delete(task);
+        if (!taskRepository.existsById(id)){
+            throw new ResourceNotFoundException("Task with id=" + id + " not found");
+        }
+        taskRepository.deleteById(id);
     }
 
     @Override
+    @CachePut(value = "tasks", key = "#result.id")
     public Task updateStatus(Long taskId, String value) {
         TaskStatus newStatus = getStatusByValue(value);
-        Task task = getTask(taskId);
+        Task task = findTaskById(taskId);
         if (task.getStatus() == newStatus) {
             throw new IllegalStateException("Status already set to the old value.");
         }
@@ -87,17 +102,19 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @CachePut(value = "tasks", key = "#result.id")
     public Task assignUserToTask(Long taskId, Long userId) {
         userClient.checkUserExist(userId);
-        Task task = getTask(taskId);
+        Task task = findTaskById(taskId);
         task.setUserId(userId);
         taskRepository.save(task);
         return task;
     }
 
     @Override
+    @CachePut(value = "tasks", key = "#result.id")
     public Task unassignUserToTask(Long taskId) {
-        Task task = getTask(taskId);
+        Task task = findTaskById(taskId);
         task.setUserId(null);
         taskRepository.save(task);
         return task;
@@ -106,5 +123,10 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<Task> getAllByUserId(Long userId) {
         return taskRepository.findByUserId(userId);
+    }
+
+    private Task findTaskById(Long id){
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id=" + id + " not found"));
     }
 }

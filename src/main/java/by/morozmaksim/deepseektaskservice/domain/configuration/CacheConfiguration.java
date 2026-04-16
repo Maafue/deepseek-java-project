@@ -15,16 +15,23 @@ import java.util.concurrent.TimeUnit;
 public class CacheConfiguration {
 
     @Bean
-    public CacheManager cacheManager(){
-        CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
-        caffeineCacheManager.setCaffeine(caffeineCacheBuilder());
-        caffeineCacheManager.setCacheNames(Arrays.asList("tasks"));
-        return caffeineCacheManager;
+    public CacheManager cacheManager() {
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+        cacheManager.setCaffeine(caffeineCacheBuilder());
+        cacheManager.setCacheNames(Arrays.asList(
+                "tasks",
+                "allTasks",
+                "tasksByStatus",
+                "userTasks"
+        ));
+        return cacheManager;
     }
 
     @Bean
-    Caffeine<Object, Object> caffeineCacheBuilder(){
+    public Caffeine<Object, Object> caffeineCacheBuilder() {
         return Caffeine.newBuilder()
-                .expireAfterWrite(3, TimeUnit.MINUTES);
+                .expireAfterWrite(3, TimeUnit.MINUTES)
+                .maximumSize(1000)
+                .recordStats();
     }
 }
