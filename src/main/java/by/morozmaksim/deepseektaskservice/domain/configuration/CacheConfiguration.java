@@ -19,10 +19,7 @@ public class CacheConfiguration {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setCaffeine(caffeineCacheBuilder());
         cacheManager.setCacheNames(Arrays.asList(
-                "tasks",
-                "allTasks",
-                "tasksByStatus",
-                "userTasks"
+                "tasks"
         ));
         return cacheManager;
     }
